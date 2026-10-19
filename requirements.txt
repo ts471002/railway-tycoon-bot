@@ -1,0 +1,10 @@
+# 铁路大亨 · 下一站推测 —— 依赖
+numpy>=1.26
+pillow>=10.0
+pywin32>=306
+windows-capture>=1.3.0
+# OCR 后端（离线运行，识别右侧面板的中文和数字）
+# Python 3.12 及以下：pip install rapidocr-onnxruntime
+# Python 3.13 及以上：pip install rapidocr onnxruntime
+rapidocr>=3.0.0
+onnxruntime>=1.20.0

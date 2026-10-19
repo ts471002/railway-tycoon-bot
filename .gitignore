@@ -1,0 +1,19 @@
+# 本地虚拟环境
+.venv/
+venv/
+
+# PyInstaller 构建缓存与产物（双击 .bat 就能重新生成）
+build/
+build_*/
+dist/
+payload.tar.xz
+
+# 运行状态和日志（含学到的面板位置、本局记录、截图）
+data/
+logs/
+*.log
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.egg-info/
