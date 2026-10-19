@@ -3,8 +3,12 @@
 一个小窗口程序：**后台读游戏画面，告诉你下一站最可能是什么**。
 不点击、不抢前台、不动鼠标，游戏放在后台或被别的窗口挡住都能读。
 
-双击 `dist\铁路大亨推测-安装版.exe` 装一次（可以自己选装到哪），之后点桌面图标就能开，
-启动 1.25 秒。窗口常驻屏幕右下角。
+双击安装包装一次（可以自己选装到哪），之后点桌面图标就能开，启动 1.25 秒。
+窗口常驻屏幕右下角。
+
+* 只想用：到 [Releases](https://github.com/ts471002/railway-tycoon-bot/releases) 下 `RailwayTycoon-Setup-*.exe`。
+* 想要源码：clone 下来双击 `打包安装版.bat`，会自己出安装包（需要先建好 `.venv`，
+  见下面「自己跑源码」）。
 
 ---
 
@@ -112,7 +116,9 @@
 
 ---
 
-## 换分辨率 / 换电脑读不到怎么办**已经自动处理了，不用管。** 但知道原理能少踩坑：
+## 换分辨率 / 换电脑读不到怎么办
+
+**已经自动处理了，多数情况不用管。** 但知道原理能少踩坑：
 
 面板的读取位置是在 1600×900 的窗口下量出来的。原来的做法是**按比例换算**，
 看着很合理，实际上有个前提——游戏 UI 也跟着窗口等比缩放。可游戏（Unreal 的 UMG）
@@ -226,7 +232,7 @@
 ## 文件
 
 ```
-dist/铁路大亨推测-安装版.exe        安装版（推荐：一个文件，装一次，启动 1.25 秒）
+dist/铁路大亨推测-安装版.exe        安装版（打包产物，不进 git；双击 bat 生成）
 dist/铁路大亨推测-快速版/           文件夹版（安装版的原料，也能直接双击里面的 exe）
 installer.py                         安装器（选路径、解压、建快捷方式）
 launcher.py                          程序入口（exe 和源码都从这里进，带 --selftest 自检）
@@ -238,27 +244,40 @@ tools/make_payload.py                把文件夹版压成 payload.tar.xz
 铁路大亨推测.bat                     源码方式启动（改代码时用）
 tools/next_station_gui.py            界面（后台抓屏 + 刷新策略）
 tools/next_station.py                读屏、OCR、解析、纠错、记账、区域比例换算
+tools/panel_calib.py                 手动校准窗口（框一次，固定读取区域）
+tools/panel_regression.py            回归测试（6 种分辨率/摆位的合成面板）
+bot/dpi.py                           声明 DPI 感知（显示缩放必须）
 bot/journey.py                       求解器：剩余多重集 + 滚动提示 + 禁三连
 bot/bgcapture.py                     WGC 后台抓屏
 bot/ocr.py                           OCR 后端（RapidOCR）
 bot/paths.py                         数据目录（源码=项目根，exe=exe 所在目录）
-data/journey_state.json              本局记录（已走站数、每站提示、剩余快照）
+assets/sample_frame.png              回归测试用的一张游戏截图
+data/journey_state.json              本局记录（本地状态，不进 git）
 data/journey_archive/                每局结束时的存档
 ```
+
+`.venv/`、`build*/`、`dist/`、`payload.tar.xz`、`data/`、`logs/` 都在 `.gitignore` 里，
+仓库只放源码。
 
 ## 调试
 
 ```bat
 .venv\Scripts\python.exe tools\next_station.py        :: 读一次，打印结论
 .venv\Scripts\python.exe tools\next_station.py dump   :: 打印画面里所有 OCR 文字
-"dist\铁路大亨推测.exe" --selftest                     :: exe 自检，写 logs\selftest.txt
+.venv\Scripts\python.exe tools\panel_regression.py    :: 回归测试：6 种分辨率/摆位都要读到
+铁路大亨推测.exe --selftest                            :: exe 自检，写 logs\selftest.txt
 ```
 
 认错数字时先跑 `dump`，看看 OCR 到底读到了什么。
+改了读屏逻辑就跑一遍 `panel_regression.py`，防止在某种分辨率上悄悄失效。
 
-## 安装（换机器时）
+## 自己跑源码（开发环境）
 
 ```bat
 python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
+铁路大亨推测.bat          :: 以源码启动界面
+打包安装版.bat            :: 出 dist\铁路大亨推测-安装版.exe
 ```
+
+要求 Python 3.11+、Windows 10 1809+（后台抓屏用的 WGC 接口从这版才有）。
